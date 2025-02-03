@@ -10,9 +10,11 @@ function App() {
     // <Login />
     // <SignUp/>
     <NavigationContainer>
-      <stack.Navigator>
-        <stack.Screen name="Login" component={Login} />
-        <stack.Screen name="SignUp" component={SignUp} />
+      <stack.Navigator
+      initialRouteName='Login'
+      >
+        <stack.Screen name="Login" component={Login} options={{headerShown: false}}/>
+        <stack.Screen name="SignUp" component={SignUp} options={{headerShown: false}}/>
       </stack.Navigator>
     </NavigationContainer>
   )
