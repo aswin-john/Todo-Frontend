@@ -96,9 +96,6 @@ const SignUp = () => {
                 </View>
 
 
-
-
-
                 {/* Terms and Condition */}
                 <View style = {{width:'98%',marginTop:13,flexDirection:"row",height:30,}}>
                   <View style = {{flexDirection:'row'}}>
