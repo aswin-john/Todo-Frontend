@@ -106,11 +106,11 @@ const Login = () => {
                 <View style={{marginTop:40,height:33,width:"100%",alignItems:'center',justifyContent:'center',flexDirection:'row',marginBottom:102}}>
                   <Text style={[Styles.poppinsMed14,{color:'#A5A5A5'}]}>Don't have an account ?</Text>  
                   <TouchableOpacity 
-  style={{marginLeft:9}} 
-  onPress={() => navigation.navigate('SignUp')}
->
-  <Text style={[Styles.poppinsMed15Primary,{}]}>Sign Up</Text>
-</TouchableOpacity>
+                    style={{marginLeft:9}} 
+                    onPress={() => navigation.navigate('SignUp')}
+                  >
+                    <Text style={[Styles.poppinsMed15Primary,{}]}>Sign Up</Text>
+                  </TouchableOpacity>
                 </View>
 
 
