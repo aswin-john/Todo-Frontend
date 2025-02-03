@@ -2,11 +2,13 @@ import React, {useEffect, useState, createRef, useContext} from 'react';
 import { View, Text, StyleSheet, SafeAreaView,Image,Dimensions, TextInput,KeyboardAvoidingView,ScrollView, TouchableOpacity } from 'react-native'
 import eventoqlogo from '../../Images/logo/eventoqlogo.png'
 import Styles from '../../Styles/Styles';
+import { useNavigation } from '@react-navigation/native';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 
 const Login = () => {
+  const navigation = useNavigation();
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
@@ -103,7 +105,10 @@ const Login = () => {
                 {/* Signup Section */}
                 <View style={{marginTop:40,height:33,width:"100%",alignItems:'center',justifyContent:'center',flexDirection:'row',marginBottom:102}}>
                   <Text style={[Styles.poppinsMed14,{color:'#A5A5A5'}]}>Don't have an account ?</Text>  
-                  <TouchableOpacity style = {{marginLeft:9}}>
+                  <TouchableOpacity 
+                    style={{marginLeft:9}} 
+                    onPress={() => navigation.navigate('SignUp')}
+                  >
                     <Text style={[Styles.poppinsMed15Primary,{}]}>Sign Up</Text>
                   </TouchableOpacity>
                 </View>
