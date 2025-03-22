@@ -4,7 +4,7 @@ import { errorHandler } from "../utils/error.js";
 
 export const createTask = async (req, res, next) => {
     try {
-      // ✅ Ensure user is authenticated (userId from token)
+      //Ensure user is authenticated (userId from token)
 
       if (!req.user) {
         return res.status(401).json({ message: "Unauthorized: Please log in" });
@@ -12,12 +12,12 @@ export const createTask = async (req, res, next) => {
 
       const { title, description, status, dueDate, priority } = req.body;
 
-      // ✅ Validation: Ensure title exists and is not empty
+      // Validation: Ensure title exists and is not empty
       if (!title || title.trim() === "") {
         return res.status(400).json({ message: "Title is required" });
       }
 
-      // ✅ Validation: Ensure status is valid (if provided)
+      //Validation: Ensure status is valid (if provided)
       const validStatuses = ["pending", "in_progress", "completed"];
       if (status && !validStatuses.includes(status)) {
 
@@ -25,18 +25,18 @@ export const createTask = async (req, res, next) => {
 
       }
 
-      // ✅ Validation: Ensure priority is valid (if provided)
+      //Validation: Ensure priority is valid (if provided)
       const validPriorities = ["low", "medium", "high"];
       if (priority && !validPriorities.includes(priority)) {
         return res.status(400).json({ message: "Invalid priority value" });
       }
 
-      // ✅ Validation: Ensure dueDate is a valid date (if provided)
+      // Validation: Ensure dueDate is a valid date (if provided)
       if (dueDate && isNaN(Date.parse(dueDate))) {
         return res.status(400).json({ message: "Invalid dueDate format" });
       }
 
-      // ✅ Create a new task with the validated data
+      //Create a new task with the validated data
       const Task = await Tasks.create({
         title,
         description,
@@ -58,7 +58,7 @@ export const createTask = async (req, res, next) => {
       if (!TasksList) {
         return next(errorHandler(404, "listing not found"));
       }
-      res.status(200).json({data:TasksList,message:'Task retrieved successfully'});
+      res.status(200).json({data:[TasksList],message:'Task retrieved successfully'});
     } catch (error) {
       next(errorHandler(500, "Task does  not exist"));
       // next(error);
