@@ -168,7 +168,7 @@ export const createTask = async (req, res, next) => {
         // Convert user ID from token into ObjectId and fetch tasks
         const userTasks = await Tasks.find({ userId: new mongoose.Types.ObjectId(req.user.id) });
 
-        res.status(200).json(userTasks);
+        res.status(200).json({message:'user tasks retrieved succesfully',data:userTasks});
     } catch (error) {
         next(error);
     }
