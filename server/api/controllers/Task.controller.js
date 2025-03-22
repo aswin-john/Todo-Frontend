@@ -54,10 +54,56 @@ export const createTask = async (req, res, next) => {
   export const getTasks = async (req, res, next) => {
     try {
       const TasksList = await Tasks.findById(req.params.id);
+
       if (!TasksList) {
         return next(errorHandler(404, "listing not found"));
       }
-      res.status(200).json(TasksList);
+      res.status(200).json({data:TasksList,message:'Task retrieved successfully'});
+    } catch (error) {
+      next(errorHandler(500, "Task does  not exist"));
+      // next(error);
+    }
+  };
+
+  export const deleteTask = async (req, res, next) => {
+    const Task = await Tasks.findById(req.params.id);
+    console.log('this user task >>',Task);
+    console.log('this user user id >>',req.user.id);
+    if (!Task) {
+      return next(errorHandler(404, "listing not found"));
+    }
+    if (req.user.id !== Task.userId.toString()) {
+      return next(errorHandler(404, "you can only  delete your own listing "));
+    }
+    try {
+      await Tasks.findByIdAndDelete(req.params.id);
+      res.status(200).json("Task has been deleted");
+    } catch (error) {
+      next(error);
+    }
+  };
+  export const updateTask = async (req, res, next) => {
+    const Task = await Tasks.findById(req.params.id);
+    if (!Task) {
+      return next(errorHandler(404, "listing not found"));
+    }
+    if (req.user.id !== Task.userId.toString()) {
+      return next(errorHandler(401, "you can update your own listing"));
+    }
+     // Validate request body: Allow only defined schema fields
+     const allowedFields = ["title", "description", "status", "dueDate", "priority"];
+     const invalidFields = Object.keys(req.body).filter(field => !allowedFields.includes(field));
+
+     if (invalidFields.length > 0) {
+         return next(errorHandler(400, `Invalid fields: ${invalidFields.join(", ")}`));
+     }
+    try {
+      const updatedTask = await Tasks.findByIdAndUpdate(
+        req.params.id,
+        req.body,
+        { new: true }
+      );
+      res.status(200).json(updatedTask);
     } catch (error) {
       next(error);
     }
