@@ -1,7 +1,7 @@
 import express from "express";
 
 import { verifyToken } from "../utils/verifyUser.js";
-import { createTask, deleteTask, getTaskListings, getTasks, getUsersTask, updateTask } from "../controllers/Task.controller.js";
+import { createTask, deleteTask, getTasks, getUsersTask, updateTask } from "../controllers/Task.controller.js";
 
 const router = express.Router();
 // Handle GET requests to prevent "Cannot GET /api/auth/signup" error

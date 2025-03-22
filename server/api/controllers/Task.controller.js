@@ -110,57 +110,57 @@ export const createTask = async (req, res, next) => {
     }
   };
 
-  export const getTaskListings = async (req, res, next) => {
-    try {
-      const limit = parseInt(req.query.limit) || 10;
-      const startIndex = parseInt(req.query.startIndex) || 0;
+  // export const getTaskListings = async (req, res, next) => {
+  //   try {
+  //     const limit = parseInt(req.query.limit) || 10;
+  //     const startIndex = parseInt(req.query.startIndex) || 0;
 
-      // Search by title or description
-      const searchTerm = req.query.searchTerm || "";
-      const searchFilter = {
-        $or: [
-          { title: { $regex: searchTerm, $options: "i" } },
-          { description: { $regex: searchTerm, $options: "i" } }
-        ]
-      };
+  //     // Search by title or description
+  //     const searchTerm = req.query.searchTerm || "";
+  //     const searchFilter = {
+  //       $or: [
+  //         { title: { $regex: searchTerm, $options: "i" } },
+  //         { description: { $regex: searchTerm, $options: "i" } }
+  //       ]
+  //     };
 
-      // Filter by status, priority, and userId
-      const status = req.query.status ? req.query.status : { $in: ["pending", "in_progress", "completed"] };
-      const priority = req.query.priority ? req.query.priority : { $in: ["low", "medium", "high"] };
-      const userId = req.query.userId ? req.query.userId : { $exists: true };
+  //     // Filter by status, priority, and userId
+  //     const status = req.query.status ? req.query.status : { $in: ["pending", "in_progress", "completed"] };
+  //     const priority = req.query.priority ? req.query.priority : { $in: ["low", "medium", "high"] };
+  //     const userId = req.query.userId ? req.query.userId : { $exists: true };
 
-      // Date filtering
-      let dueDateFilter = {};
-      if (req.query.dueDateBefore) {
-        dueDateFilter["$lte"] = new Date(req.query.dueDateBefore);
-      }
-      if (req.query.dueDateAfter) {
-        dueDateFilter["$gte"] = new Date(req.query.dueDateAfter);
-      }
+  //     // Date filtering
+  //     let dueDateFilter = {};
+  //     if (req.query.dueDateBefore) {
+  //       dueDateFilter["$lte"] = new Date(req.query.dueDateBefore);
+  //     }
+  //     if (req.query.dueDateAfter) {
+  //       dueDateFilter["$gte"] = new Date(req.query.dueDateAfter);
+  //     }
 
-      const sort = req.query.sort || "createdAt";
-      const order = req.query.order === "asc" ? 1 : -1;
+  //     const sort = req.query.sort || "createdAt";
+  //     const order = req.query.order === "asc" ? 1 : -1;
 
-      const tasks = await Tasks.find({
-        ...searchFilter,
-        status,
-        priority,
-        userId,
-        ...(Object.keys(dueDateFilter).length ? { dueDate: dueDateFilter } : {})
-      })
-        .sort({ [sort]: order })
-        .limit(limit)
-        .skip(startIndex);
-        if(tasks.length<1){
-          return res.status(200).json({tasks,message:'no tasks found....'});
+  //     const tasks = await Tasks.find({
+  //       ...searchFilter,
+  //       status,
+  //       priority,
+  //       userId,
+  //       ...(Object.keys(dueDateFilter).length ? { dueDate: dueDateFilter } : {})
+  //     })
+  //       .sort({ [sort]: order })
+  //       .limit(limit)
+  //       .skip(startIndex);
+  //       if(tasks.length<1){
+  //         return res.status(200).json({tasks,message:'no tasks found....'});
 
-        }
+  //       }
 
-      return res.status(200).json(tasks);
-    } catch (error) {
-      next(error);
-    }
-  };
+  //     return res.status(200).json(tasks);
+  //   } catch (error) {
+  //     next(error);
+  //   }
+  // };
   export const getUsersTask = async (req, res, next) => {
     try {
         // console.log('Authenticated User ID >>>>>', req.user.id.toString());
