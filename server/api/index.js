@@ -30,6 +30,7 @@ app.listen(3000, () => {
 
 app.use("/api/auth", authRouter);
 app.use("/api", TaskRouter);
+// app.use("/api", useRouter);
 
 app.use((err, req, res, next) => {
   const statusCode = err.statusCode || 500;

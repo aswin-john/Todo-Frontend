@@ -1,4 +1,5 @@
 
+import mongoose from "mongoose";
 import Tasks from "../models/Task.model.js";
 import { errorHandler } from "../utils/error.js";
 
@@ -160,3 +161,15 @@ export const createTask = async (req, res, next) => {
       next(error);
     }
   };
+  export const getUsersTask = async (req, res, next) => {
+    try {
+        // console.log('Authenticated User ID >>>>>', req.user.id.toString());
+
+        // Convert user ID from token into ObjectId and fetch tasks
+        const userTasks = await Tasks.find({ userId: new mongoose.Types.ObjectId(req.user.id) });
+
+        res.status(200).json(userTasks);
+    } catch (error) {
+        next(error);
+    }
+};
