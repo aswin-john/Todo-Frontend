@@ -80,7 +80,10 @@ const Login = () => {
 
                 {/* Login Button */}
                 <View style = {{marginTop:35,width:'100%'}}>
-                  <TouchableOpacity style={[Styles.buttonContainer,{}]}>
+                  <TouchableOpacity 
+                  style={[Styles.buttonContainer,{}]}
+                  onPress={() => navigation.navigate('Home')}
+                  >
                     <Text style={Styles.poppinsSemi17White}>Login</Text>
 
                   </TouchableOpacity>
