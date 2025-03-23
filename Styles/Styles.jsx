@@ -19,9 +19,15 @@ const Styles = StyleSheet.create({
     color:'#000000'
   },
 
+  CreateTaskText:{
+    fontSize: 20,
+    fontFamily: 'Poppins-Bold',
+    color:'white'
+  },
+
   textContainer:{
     fontSize: 17,
-    fontFamily: 'Poppins-Medium',
+    fontFamily: 'Poppins-Bold',
     color:'#000000'
   },
 
@@ -54,9 +60,10 @@ const Styles = StyleSheet.create({
     height:46,
     borderRadius:6,
     borderColor:'#A1A1A1',
-    backgroundColor:'#FF6666',
+    backgroundColor:'#007BFF',
     alignItems:'center',
-    justifyContent:'center'
+    justifyContent:'center',
+    elevation: 8,
   },
 
   poppinsSemi17White:{
@@ -70,7 +77,7 @@ const Styles = StyleSheet.create({
     width: "100%",
     height:44,
     borderRadius:6,
-    borderColor:'#FF6666',
+    borderColor:"#007BFF",
     backgroundColor:'#FFFFFF',
     alignItems:'center',
     justifyContent:'center'
@@ -92,6 +99,53 @@ const Styles = StyleSheet.create({
     fontSize: 14,
     fontFamily: 'Poppins-Medium',
     color:'#FF6A6A'
+  },
+
+  modalOverlay: { 
+    flex: 1, 
+    backgroundColor: "rgba(0, 0, 0, 0.5)", 
+    justifyContent: "center", 
+    alignItems: "center" 
+  },
+
+  modalContainer: { 
+    backgroundColor: "white", 
+    padding: 20, 
+    width: "90%", 
+    borderRadius: 10 
+  },
+
+  modalTitle: { 
+    fontSize: 18, 
+    fontFamily: 'Poppins-Medium',
+    textAlign: "center", 
+    marginBottom: 10 
+  },
+
+
+  buttonRow: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    marginTop: 20 
+  },
+  cancelButton: { 
+    flex: 1, 
+    backgroundColor: "#ccc", 
+    padding: 10, 
+    borderRadius: 5, 
+    alignItems: "center", 
+    marginRight: 10 
+  },
+  createButton: { 
+    flex: 1, 
+    backgroundColor: "#007BFF", 
+    padding: 10, 
+    borderRadius: 5, 
+    alignItems: "center" 
+  },
+  buttonText: { 
+    color: "#fff", 
+    fontWeight: "bold" 
   },
 
   
