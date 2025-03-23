@@ -148,6 +148,21 @@ const Styles = StyleSheet.create({
     fontWeight: "bold" 
   },
 
+  dateTimeContainer: { 
+    flexDirection: "row", 
+    justifyContent: "space-between", 
+    // marginTop: 10 
+  },
+  dateButton: { 
+    borderWidth: 1, 
+    borderColor: "#ccc", 
+    borderRadius: 5, 
+    padding: 10, 
+    width: "48%", 
+    alignItems: "center" ,
+    backgroundColor: '#F9FFFA', 
+  },
+
   
  
 });

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, SafeAreaView, Image, Dimensions, TextInput, Key
 import eventoqlogo from '../../Images/logo/eventoqlogo.png';
 import Styles from '../../Styles/Styles';
 import { useNavigation } from '@react-navigation/native';
+import DateTimePicker from "@react-native-community/datetimepicker";
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -12,6 +13,12 @@ const Home = () => {
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
   const [modalVisible, setModalVisible] = useState(false);
+
+  const [date, setDate] = useState(new Date());
+  const [time, setTime] = useState(new Date());
+  const [showDatePicker, setShowDatePicker] = useState(false);
+  const [showTimePicker, setShowTimePicker] = useState(false);
+
 
   const createTaskModal = () => {
     return (
@@ -50,6 +57,51 @@ const Home = () => {
                     keyboardType="email-address"
                   />
                 </View>
+
+                {/* Date and Time Picker Text Labels */}
+
+                <View style={{flexDirection:'row',width:'100%',}}>
+                  <View style = {{width:'50%',}}>
+                    <Text style={[Styles.textContainer,{fontFamily: 'Poppins-Regular',marginTop: 10,}]}> Date </Text>
+                  </View>
+                  <View style = {{width:'50%',}}>
+                    <Text style={[Styles.textContainer,{fontFamily: 'Poppins-Regular',marginTop: 10,}]}> Time </Text>
+                  </View>
+                </View>
+
+          {/* Date and Time Picker */}
+          <View style={Styles.dateTimeContainer}>
+              <TouchableOpacity style={Styles.dateButton} onPress={() => setShowDatePicker(true)}>
+                <Text>{date.toLocaleDateString()}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={Styles.dateButton} onPress={() => setShowTimePicker(true)}>
+                <Text>{time.toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}</Text>
+              </TouchableOpacity>
+            </View>
+
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={(event, selectedDate) => {
+                  setShowDatePicker(false);
+                  if (selectedDate) setDate(selectedDate);
+                }}
+              />
+            )}
+
+            {showTimePicker && (
+              <DateTimePicker
+                value={time}
+                mode="time"
+                display="default"
+                onChange={(event, selectedTime) => {
+                  setShowTimePicker(false);
+                  if (selectedTime) setTime(selectedTime);
+                }}
+              />
+            )}
 
 
           {/* Action Buttons */}
@@ -108,6 +160,9 @@ const styles = StyleSheet.create({
     width: '100%',
     height: windowHeight / 10, // Adjust the height as needed
   },
+
+
+  
   
  
   
