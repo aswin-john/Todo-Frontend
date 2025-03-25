@@ -3,15 +3,133 @@ import { View, Text, StyleSheet, SafeAreaView,Image,Dimensions, TextInput,Keyboa
 import eventoqlogo from '../../Images/logo/eventoqlogo.png'
 import Styles from '../../Styles/Styles';
 import { useNavigation } from '@react-navigation/native';
+import { AuthContext } from '../../Context/AuthContext';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 
 const Login = () => {
   const navigation = useNavigation();
+  const {loading,  usingEmailLogin, } =
+    useContext(AuthContext);
 
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+
+  const loginHandler = async () => {
+    const isValid = userEmailLoginValidation();
+  
+    if (isValid) {
+      try {
+        const response = await usingEmailLogin(loginEmail, loginPassword);
+        // Handle the response here
+        console.log('response?.data?.user--->', response?.accesToken);
+        if (response?.accesToken) {
+          console.log('response?.data?.user--->', response?.data);
+  
+          // Snackbar.show({
+          //   text: 'login-successfully',
+          //   duration: Snackbar.LENGTH_LONG,
+          //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          //   textColor: Colors.WHITE,
+          //   marginBottom: 30,
+          // });
+          alert('Login successfully');
+          navigation.navigate('Home');
+        } else {
+          // Snackbar.show({
+          //   text: 'please-check-email',
+          //   duration: Snackbar.LENGTH_LONG,
+          //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          //   textColor: Colors.WHITE,
+          //   marginBottom: 30,
+          // });
+          if (error?.message === 'wrong credentials!') {
+            // Snackbar.show({
+            //   text: 'Unregistered Email Id',
+            //   duration: Snackbar.LENGTH_LONG,
+            //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            //   textColor: Colors.WHITE,
+            //   marginBottom: 30,
+            // });
+            alert('Unregistered Email Id');
+          } else if (error?.message === 'user not found!') {
+            // Snackbar.show({
+            //   text: 'Incorrect Password',
+            //   duration: Snackbar.LENGTH_LONG,
+            //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            //   textColor: Colors.WHITE,
+            //   marginBottom: 30,
+            // });
+            alert('Incorrect Password');
+          } else {
+            // Snackbar.show({
+            //   text: error?.message ? error?.message : 'something-went-wrong',
+            //   duration: Snackbar.LENGTH_LONG,
+            //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+            //   textColor: Colors.WHITE,
+            //   marginBottom: 30,
+            // });
+            alert(error?.message ? error?.message : 'Something went wrong');
+          }
+        }
+      } catch (error) {
+        console.log('Error---->', error);
+        alert(error)
+        
+      }
+    }
+  };
+
+
+  const userEmailLoginValidation = () => {
+    // Perform your validation checks here
+    if (!loginEmail) {
+      // Display an error message or handle the validation failure
+      // Snackbar.show({
+      //   text: 'enter-mail-password',
+      //   duration: Snackbar.LENGTH_LONG,
+      //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      //   textColor: Colors.WHITE,
+      //   marginBottom: 30,
+      // });
+      alert('Enter your email and password');
+      return false;
+    }
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(loginEmail)) {
+      // Snackbar.show({
+      //   text: 'invalid-email',
+      //   duration: Snackbar.LENGTH_LONG,
+      //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      //   textColor: Colors.WHITE,
+      //   marginBottom: 30,
+      // });
+      alert('Invalid email');
+      return false;
+    }
+    if (!loginPassword) {
+      // Display an error message or handle the validation failure
+      // Snackbar.show({
+      //   text: 'Password Required',
+      //   duration: Snackbar.LENGTH_LONG,
+      //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      //   textColor: Colors.WHITE,
+      //   marginBottom: 30,
+      // });
+      alert('Password required');
+      return false;
+    }
+
+    // Validate email format
+
+    // If all validations pass, return true
+    return true;
+  };
+
+
 
     const topPortion = () => {
         return (
@@ -82,7 +200,7 @@ const Login = () => {
                 <View style = {{marginTop:35,width:'100%'}}>
                   <TouchableOpacity 
                   style={[Styles.buttonContainer,{}]}
-                  onPress={() => navigation.navigate('Home')}
+                  onPress={loginHandler}
                   >
                     <Text style={Styles.poppinsSemi17White}>Login</Text>
 
