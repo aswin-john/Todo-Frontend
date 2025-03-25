@@ -2,16 +2,132 @@ import React, {useEffect, useState, createRef, useContext} from 'react';
 import { View, Text, StyleSheet, SafeAreaView,Image,Dimensions, TextInput,KeyboardAvoidingView,ScrollView, TouchableOpacity } from 'react-native'
 import eventoqlogo from '../../Images/logo/eventoqlogo.png'
 import Styles from '../../Styles/Styles';
+import { AuthContext } from '../../Context/AuthContext';
+import { useNavigation } from '@react-navigation/native';
+import { Alert } from 'react-native';
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
 
 const SignUp = () => {
+  const navigation = useNavigation();
 
     const [signUpName, setSignUpName] = useState('');
     const [signUpEmail, setSignUpEmail] = useState('');
     const [signUpPassword, setSignUpPassword] = useState('');
     const [signUpConfirmPassword, setSignUpConfirmPassword] = useState('');
+
+    const { loading,  agentRegistration,  } = useContext(AuthContext)
+
+    const signUpHandler = async () => {
+      //navigation.navigate("SignupContinue");
+      console.log("SignUP fields ----",signUpName,signUpEmail, signUpPassword)
+
+      const isAgentValid = agentdataValidation()
+      if (isAgentValid) {
+        console.log("After Validation ");
+
+          try {
+              const response = await agentRegistration(signUpName,signUpEmail, signUpPassword);
+              console.log("Response----->>>>",response)
+              console.log("Response----->>>>",response?.message)
+
+            if(response?.message === 'User created successfully')
+            {
+              Alert.alert('Success', response?.message);
+              navigation.navigate('Login')
+            }
+
+              
+              
+          } catch (error) {
+              
+
+              // Snackbar.show({
+              //     text: "Something went wrong",
+              //     //text: response?.message,
+              //     duration: Snackbar.LENGTH_LONG,
+              //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+              //     textColor: Colors.WHITE,
+              //     marginBottom: 30,
+              // });
+              Alert.alert('Success', response?.message);
+              console.log('Registration failed signup====>', error);
+          }
+      }
+  }
+
+
+  const agentdataValidation = () => {
+    // Perform your validation checks here
+    if (!signUpName || !signUpEmail || !signUpPassword || !signUpConfirmPassword ) {
+      
+       
+        // Snackbar.show({
+        //     text: t('all-field-required'),
+        //     duration: Snackbar.LENGTH_LONG,
+        //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        //     textColor: Colors.WHITE,
+        //     marginBottom: 30,
+        // });
+        console.warn('All fields are required');
+        console.log("All fields are required")
+   
+        return false;
+    }
+
+    
+    // Validate email format
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(signUpEmail)) {
+        
+        console.warn('Invalid email format');
+        console.log("Invalid email format")
+
+        return false;
+    }
+
+    // Validate password length
+    if (signUpPassword.length < 6) {
+       
+        // Snackbar.show({
+        //     text: t('password-character-size-warning'),
+        //     duration: Snackbar.LENGTH_LONG,
+        //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        //     textColor: Colors.WHITE,
+        //     marginBottom: 30
+        // });
+        console.warn('Password should be at least 6 characters long');
+        console.log("Password should be at least 6 characters long")
+
+        return false;
+    }
+
+    // Validate password and confirm password match
+    if (signUpPassword !== signUpConfirmPassword) {
+        
+        // Snackbar.show({
+        //     text: t('password-not-match'),
+        //     duration: Snackbar.LENGTH_LONG,
+        //     backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        //     textColor: Colors.WHITE,
+        //     marginBottom: 30
+        // });
+        console.warn('Password and confirm password do not match');
+        console.log("Password and confirm password do not match")
+        
+        return false;
+    }
+    // Additional custom validations can be added based on  requirements
+
+    // If all validations pass, return true
+    return true;
+};
+
+
+
+
+
 
     const topPortion = () => {
         return (
@@ -113,7 +229,10 @@ const SignUp = () => {
 
                 {/* Sign Up  Button */}
                 <View style = {{marginTop:35,width:'100%'}}>
-                  <TouchableOpacity style={[Styles.buttonContainer,{}]}>
+                  <TouchableOpacity 
+                  style={[Styles.buttonContainer,{}]}
+                  onPress={signUpHandler}
+                  >
                     <Text style={Styles.poppinsSemi17White}>Sign Up</Text>
 
                   </TouchableOpacity>
