@@ -45,7 +45,7 @@ const Home = () => {
         //   textColor: Colors.WHITE,
         //   marginBottom: 30
         // });
-        alert(response?.message ? response?.message : "Task created successfully");
+        alert(response?.data?.message ? response?.data?.message : "Task created successfully");
       } else {
         // Snackbar.show({
         //   text: response?.error ? response?.error : 'Something went wrong',
