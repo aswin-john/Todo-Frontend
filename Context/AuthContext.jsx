@@ -62,7 +62,7 @@ export const AuthProvider = ({children}) => {
       // setTokenValue(response.data.data.tokens.access);
       console.log("Response Data",response)
       setLoading(false);
-      return response.data;
+      return response?.data;
     } catch (error) {
       if (error.response) {
         setLoading(false);
@@ -113,13 +113,75 @@ export const AuthProvider = ({children}) => {
   };
 
 
+  const createTaskFunc = async (
+    taskTitle,taskDescription ,combinedDateTime
+  ) => {
+    setLoading(true);
+    console.log(
+      'status________________________________________',
+      taskTitle,taskDescription ,combinedDateTime
+    );
+
+    console.log(
+      'Date & TIme from Auth',
+      combinedDateTime
+    );
+    const url = `https://todo-frontend-mvps.onrender.com/api/tasks`;
+
+    
+
+   
+
+    const data = {
+      title: taskTitle,
+      description: taskDescription,
+      status:'in_progress',
+      dueDate: combinedDateTime,
+      
+      priority: 'high',
+      
+    };
+    console.log('Data--->', data);
+    try {
+      const response = await axios.post(url, data, {
+        headers: {
+          // 'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${tokensValue}`,
+          // Replace 'Bearer' with your actual authentication type if it's different
+        },
+      });
+      setLoading(false);
+      return response;
+    } catch (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        // console.log("The server responded with an error:", error.response.data);
+        // console.log("Error message--->", error.response.data.message);
+        // console.log("Status code:", error.response.status);
+        setLoading(false);
+        return error.response.data;
+      } else if (error.request) {
+        // The request was made but no response was received
+        // console.log("No response received from the server:", error.request);
+        setLoading(false);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log("Error setting up the request:", error.message);
+        setLoading(false);
+      }
+    }
+  };
+
+
 
 
   return (
     <AuthContext.Provider
       value={{
         agentRegistration,
-        usingEmailLogin
+        usingEmailLogin,
+        createTaskFunc,
       }}>
       {children}
     </AuthContext.Provider>
