@@ -10,7 +10,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const Home = () => {
   const navigation = useNavigation();
-  const { loading, createTaskFunc } = useContext(AuthContext);
+  const { loading, createTaskFunc,taskDisplayFunc } = useContext(AuthContext);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -21,13 +21,14 @@ const Home = () => {
   const [formattedTimeBackend, setFormattedTimeBackend] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [taskList, setTaskList] = useState([]);
 
   const createTaskHandler = async () => {
-    console.log("Function called----->>");
-    console.log('Task Title', taskTitle);
-    console.log('Task Description', taskDescription);
-    console.log('Task Date', formattedDateBackend);
-    console.log('Task Time', formattedTimeBackend);
+    // console.log("Function called----->>");
+    // console.log('Task Title', taskTitle);
+    // console.log('Task Description', taskDescription);
+    // console.log('Task Date', formattedDateBackend);
+    // console.log('Task Time', formattedTimeBackend);
 
     // Combine date and time into the desired format
   const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
@@ -66,6 +67,45 @@ const Home = () => {
       console.log("Error --->>", error);
     }
   };
+
+
+  const fetchTaskFunction = async () => {
+    try {
+      const response = await taskDisplayFunc();
+      console.log('Response fetchInventoryFunction--->', response);
+      if (response.status === 200 || response.status === 201) {
+        console.log('Response--->', response?.data?.data)
+        setTaskList(response?.data?.data);
+        if (response.data.length < 1) {
+          setTaskList([]);
+        }
+      } else {
+        Snackbar.show({
+          text: response.message ? response.message : t('something-went-wrong'),
+          duration: Snackbar.LENGTH_LONG,
+          backgroundColor: 'rgba(0, 0, 0, 0.5)',
+          textColor: Colors.WHITE,
+          marginBottom: 30,
+        });
+        setTaskList([]);
+      }
+    } catch (error) {
+      console.log('Hello Here home error-->',error);
+      Snackbar.show({
+        text: t('something-went-wrong'),
+        duration: Snackbar.LENGTH_LONG,
+        backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        textColor: Colors.WHITE,
+        marginBottom: 30,
+      });
+      setTaskList([]);
+    }
+  };
+
+  useEffect(() => {
+    console.log('useEffect called');
+    fetchTaskFunction();
+  }, []);
 
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);

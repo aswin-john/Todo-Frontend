@@ -174,6 +174,38 @@ export const AuthProvider = ({children}) => {
   };
 
 
+  const taskDisplayFunc = async () => {
+    setLoading(true);
+
+    console.log(
+      'for temperory use only tokn----------------------------',
+      tokensValue,
+    );
+
+    const url = `https://todo-frontend-mvps.onrender.com/api/tasks`;
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${tokensValue}`,
+        },
+      });
+      //console.log("Response--->",response)
+      // console.log("Response--->",response.data)
+      setLoading(false);
+      return response;
+    } catch (error) {
+      if (error.response) {
+        setLoading(false);
+        return error.response.data;
+      } else if (error.request) {
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  };
+
+
 
 
   return (
@@ -182,6 +214,7 @@ export const AuthProvider = ({children}) => {
         agentRegistration,
         usingEmailLogin,
         createTaskFunc,
+        taskDisplayFunc,
       }}>
       {children}
     </AuthContext.Provider>
