@@ -47,6 +47,14 @@ const Home = () => {
         //   marginBottom: 30
         // });
         alert(response?.data?.message ? response?.data?.message : "Task created successfully");
+        // Reset the values
+        setTaskTitle('');
+        setTaskDescription('');
+        setDate(new Date());
+        setTime(new Date());
+        setFormattedDateBackend('');
+        setFormattedTimeBackend('');
+        setModalVisible(false);
       } else {
         // Snackbar.show({
         //   text: response?.error ? response?.error : 'Something went wrong',
