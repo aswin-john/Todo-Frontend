@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, StyleSheet, Dimensions, FlatList } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, StyleSheet, Dimensions, FlatList, RefreshControl } from 'react-native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../Context/AuthContext';
@@ -30,6 +30,7 @@ const Home = () => {
   const [editModalVisible, setEditModalVisible] = useState(false);
 
   const [singleTask, setSingleTask] = useState({});
+  const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
 
   const createTaskHandler = async () => {
     const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
@@ -84,6 +85,7 @@ const Home = () => {
 
   const fetchTaskFunction = async () => {
     try {
+      setRefreshing(true); // Start refreshing
       const response = await taskDisplayFunc();
       // console.log('Response fetchTaskFunction--->', response);
       if (response.status === 200 || response.status === 201) {
@@ -98,6 +100,9 @@ const Home = () => {
     } catch (error) {
       console.log('Hello Here home error-->', error);
       setTaskList([]);
+    }
+    finally {
+      setRefreshing(false); // Stop refreshing
     }
   };
 
@@ -322,6 +327,12 @@ const Home = () => {
       renderItem={renderTaskList}
       keyExtractor={(item) => item?._id.toString()}
       contentContainerStyle={styles.taskListContainer}
+      refreshControl={
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={fetchTaskFunction} // Trigger fetchTaskFunction on pull-to-refresh
+        />
+      }
     />
   );
 
