@@ -5,6 +5,8 @@ import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../Context/AuthContext';
 import Styles from '../../Styles/Styles';
 
+import Icon from 'react-native-vector-icons/MaterialIcons';
+
 const windowWidth = Dimensions.get('window').width;
 const windowHeight = Dimensions.get('window').height;
 
@@ -100,9 +102,36 @@ const Home = () => {
 
   const renderTaskList = ({ item }) => (
     <View style={styles.taskItem}>
+      {/* Task Title & Description */}
       <Text style={styles.taskTitle}>{item?.title}</Text>
+      <View style = {{flexDirection: 'row', justifyContent: 'space-between',}}>
       <Text style={styles.taskDescription}>{item?.description}</Text>
-      <Text style={styles.taskDueDate}>{item?.dueDate}</Text>
+      <TouchableOpacity style={styles.viewButton}>
+          <Text style={styles.viewText}>View</Text>
+          <Icon name="visibility" size={16} color="#007AFF" />
+        </TouchableOpacity>
+        </View>
+  
+      {/* Colored Separator */}
+      <View style={styles.separator} />
+  
+      {/* Due Date & "View" Button */}
+      <View style={styles.row}>
+        <Text style={styles.taskDueDate}>{item?.dueDate}</Text>
+        
+      </View>
+  
+      {/* Edit & Delete Buttons */}
+      <View style={styles.iconRow}>
+        <TouchableOpacity style={styles.iconButton}>
+          <Icon name="edit" size={20} color="#007AFF" />
+          <Text style={styles.iconLabel}>Edit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity style={styles.iconButton}>
+          <Icon name="delete" size={20} color="#FF3B30" />
+          <Text style={styles.iconLabel}>Delete</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 
@@ -260,6 +289,44 @@ const styles = StyleSheet.create({
     fontSize: 12,
     color: '#999',
     marginTop: 5,
+  },
+
+  separator: {
+    height: 3,
+    backgroundColor: '#FF6B6B',
+    borderRadius: 2,
+    marginVertical: 8,
+  },
+  row: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+  },
+  viewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 5,
+  },
+
+  viewText: {
+    fontSize: 14,
+    color: '#007AFF',
+    fontWeight: 'bold',
+  },
+  iconRow: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginTop: 8,
+  },
+  iconButton: {
+    flexDirection: 'column',
+    alignItems: 'center',
+    marginLeft: 15,
+  },
+  iconLabel: {
+    fontSize: 12,
+    color: '#666',
+    marginTop: 3,
   },
 });
 
