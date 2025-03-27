@@ -205,6 +205,44 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+
+  const taskSingleItemDisplay = async (itemId) => {
+    setLoading(true);
+
+    console.log(
+      'for temperory use only tokn----------------------------',
+      tokensValue,
+    );
+
+    console.log(
+      'Single Item ID----------------------------',
+      itemId,
+    );
+
+    const url = `https://todo-frontend-mvps.onrender.com/api/tasks/${itemId}`;
+    console.log("Url ===>",url)
+    try {
+      const response = await axios.get(url, {
+        headers: {
+          Authorization: `Bearer ${tokensValue}`,
+        },
+      });
+      console.log("Response Auth View Task fsghdshdkjdfgs--->",response)
+      // console.log("Response sdfgsdfgsfdg--->",response.data)
+      setLoading(false);
+      return response;
+    } catch (error) {
+      if (error.response) {
+        setLoading(false);
+        return error.response.data;
+      } else if (error.request) {
+        setLoading(false);
+      } else {
+        setLoading(false);
+      }
+    }
+  };
+
   const deleteTaskItem = async deleteId => {
     setLoading(true);
     console.log('delete id,', deleteId);
@@ -259,6 +297,7 @@ export const AuthProvider = ({children}) => {
         createTaskFunc,
         taskDisplayFunc,
         deleteTaskItem,
+        taskSingleItemDisplay,
       }}>
       {children}
     </AuthContext.Provider>

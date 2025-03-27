@@ -12,7 +12,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const Home = () => {
   const navigation = useNavigation();
-  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem} = useContext(AuthContext);
+  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem, taskSingleItemDisplay} = useContext(AuthContext);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -27,15 +27,19 @@ const Home = () => {
   const [taskList, setTaskList] = useState([]);
   const [selectedTaskId, setSelectedTaskId] = useState('');
 
+  const [editModalVisible, setEditModalVisible] = useState(false);
+
+  const [singleTask, setSingleTask] = useState({});
+
   const createTaskHandler = async () => {
     const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
-    console.log('Combined DateTime:', combinedDateTime);
+    // console.log('Combined DateTime:', combinedDateTime);
 
     try {
       const response = await createTaskFunc(taskTitle, taskDescription, combinedDateTime);
-      console.log("Response---->", response);
+      // console.log("Response---->", response);
       if (response?.status === 200 || response?.status === 201) {
-        console.log("Response Data---->", response?.data);
+        // console.log("Response Data---->", response?.data);
         alert(response?.data?.message ? response?.data?.message : "Task created successfully");
         setTaskTitle('');
         setTaskDescription('');
@@ -54,9 +58,9 @@ const Home = () => {
   const fetchTaskFunction = async () => {
     try {
       const response = await taskDisplayFunc();
-      console.log('Response fetchInventoryFunction--->', response);
+      // console.log('Response fetchTaskFunction--->', response);
       if (response.status === 200 || response.status === 201) {
-        console.log('Response--->', response?.data?.data)
+        // console.log('Response--->', response?.data?.data)
         setTaskList(response?.data?.data);
         if (response.data.length < 1) {
           setTaskList([]);
@@ -72,16 +76,49 @@ const Home = () => {
 
   useEffect(() => {
     console.log('useEffect called');
+  },[taskTitle, taskDescription, date, time, formattedDateBackend, formattedTimeBackend]);
+  
+  useEffect(() => {
+    console.log('useEffect called');
     fetchTaskFunction();
   }, []);
 
+  useEffect(() => {
+    console.log('useEffect called');
+    viewTaskHandler();
+  }, [selectedTaskId]);
+
+  const viewTaskHandler = async () => {
+    console.log("View task handler function called ===>>>")
+    console.log('view task  Idd----->>>>>>>',selectedTaskId);
+    try {
+      const response = await taskSingleItemDisplay(selectedTaskId);
+      console.log('Response fetchTaskFunction--->', response?.data);
+      if (response.status === 200 || response.status === 201) {
+        console.log('Response--->', response?.data?.data[0])
+        setSingleTask(response?.data?.data[0]);
+        setTaskTitle(response?.data?.data[0]?.title);
+        setTaskDescription(response?.data?.data[0]?.description);
+        // setDate(new Date(response?.data?.data[0]?.dueDate));
+        // setTime(new Date(response?.data?.data[0]?.dueDate));
+        
+        
+      } else {
+        setSingleTask({});
+      }
+    } catch (error) {
+      console.log('Hello Here home error-->', error);
+      setSingleTask({});
+    }
+  };
+
   const taskDeleteHandler = async () => {
-    console.log('delete task  Idd----->>>>>>>',selectedTaskId);
+    // console.log('delete task  Idd----->>>>>>>',selectedTaskId);
     try {
       const response = await deleteTaskItem(selectedTaskId);
-      console.log('delete task  Idd after response from screen----->>>>>>>',selectedTaskId);
-      console.log('Response for delete task items ----->>>>>>>', response);
-      console.log('Response Status for delete task items ----->>>>>>>', response?.status);
+      // console.log('delete task  Idd after response from screen----->>>>>>>',selectedTaskId);
+      // console.log('Response for delete task items ----->>>>>>>', response);
+      // console.log('Response Status for delete task items ----->>>>>>>', response?.status);
       if (response.status === 200 || response.status === 201) {
         console.log(
           'Response for delete tsaks ----->>>>>>>',
@@ -154,6 +191,16 @@ const Home = () => {
     setDeleteModalVisible(true);
   };
 
+  const handleEditPress = (taskId) => {
+    setSelectedTaskId(taskId);
+    // Navigate to the edit screen or open an edit modal
+    console.log("Editing task with ID:", taskId);
+    // Example: navigation.navigate('EditScreen', { taskId });
+    setEditModalVisible(true)
+    viewTaskHandler()
+
+  };
+
   const renderTaskList = ({ item }) => (
     <View style={styles.taskItem}>
       {/* Task Title & Description */}
@@ -177,8 +224,14 @@ const Home = () => {
   
       {/* Edit & Delete Buttons */}
       <View style={styles.iconRow}>
-        <TouchableOpacity style={styles.iconButton}>
+        <TouchableOpacity style={styles.iconButton}
+        onPress={() => 
+          // setEditModalVisible(true)
+          handleEditPress(item?._id)
+        }
+        >
           <Icon name="edit" size={20} color="#007AFF" />
+
           <Text style={styles.iconLabel}>Edit</Text>
         </TouchableOpacity>
          {/* Update the TouchableOpacity for delete */}
@@ -257,7 +310,7 @@ const Home = () => {
       >
         <View style={Styles.modalOverlay}>
           <View style={Styles.modalContainer}>
-            <Text style={Styles.modalTitle}>New Task ToDo</Text>
+            <Text style={Styles.modalTitle}>Add New Task </Text>
             <Text style={[Styles.textContainer, { fontFamily: 'Poppins-Regular' }]}>Title Task</Text>
             <View style={[Styles.textInputContainer, { marginTop: 5, backgroundColor: '#F9FFFA' }]}>
               <TextInput
@@ -325,6 +378,87 @@ const Home = () => {
     );
   };
 
+
+  const editTaskModal = () => {
+    return (
+      <Modal
+        animationType="slide"
+        transparent={true}
+        visible={editModalVisible}
+        onRequestClose={() => {
+          setEditModalVisible(!editModalVisible);
+        }}
+      >
+        <View style={Styles.modalOverlay}>
+          <View style={Styles.modalContainer}>
+            <Text style={Styles.modalTitle}>Edit Task </Text>
+            <Text style={[Styles.textContainer, { fontFamily: 'Poppins-Regular' }]}>Title Task</Text>
+            <View style={[Styles.textInputContainer, { marginTop: 5, backgroundColor: '#F9FFFA' }]}>
+              <TextInput
+                style={{ start: 16, color: '#000000', fontFamily: 'Inter-Regular', marginVertical: 1, width: '90%' }}
+                placeholder='Add Task Name...'
+                placeholderTextColor='#A1A1A1'
+                value={taskTitle}
+                onChangeText={(text) => setTaskTitle(text)}
+              />
+            </View>
+            <Text style={[Styles.textContainer, { fontFamily: 'Poppins-Regular', marginTop: 10 }]}>Description</Text>
+            <View style={[Styles.textInputContainer, { backgroundColor: '#F9FFFA', height: 150 }]}>
+              <TextInput
+                style={{ start: 16, color: '#000000', fontFamily: 'Inter-Regular', marginVertical: 1, width: '90%', height: 150 }}
+                placeholder='Add Description...'
+                placeholderTextColor='#A1A1A1'
+                value={taskDescription}
+                onChangeText={(text) => setTaskDescription(text)}
+              />
+            </View>
+            <View style={{ flexDirection: 'row', width: '100%' }}>
+              <View style={{ width: '50%' }}>
+                <Text style={[Styles.textContainer, { fontFamily: 'Poppins-Regular', marginTop: 10 }]}>Date</Text>
+              </View>
+              <View style={{ width: '50%' }}>
+                <Text style={[Styles.textContainer, { fontFamily: 'Poppins-Regular', marginTop: 10 }]}>Time</Text>
+              </View>
+            </View>
+            <View style={Styles.dateTimeContainer}>
+              <TouchableOpacity style={Styles.dateButton} onPress={() => setShowDatePicker(true)}>
+                <Text>{date ? date.toLocaleDateString() : 'Select Date'}</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={Styles.dateButton} onPress={() => setShowTimePicker(true)}>
+                <Text>{time ? time.toLocaleTimeString() : 'Select Time'}</Text>
+              </TouchableOpacity>
+            </View>
+            {showDatePicker && (
+              <DateTimePicker
+                value={date}
+                mode="date"
+                display="default"
+                onChange={handleDateChange}
+              />
+            )}
+            {showTimePicker && (
+              <DateTimePicker
+                value={time}
+                mode="time"
+                display="default"
+                onChange={handleTimeChange}
+              />
+            )}
+
+            <View style={Styles.buttonRow}>
+              <TouchableOpacity style={Styles.cancelButton} onPress={() => setEditModalVisible(false)}>
+                <Text style={Styles.buttonText}>Cancel</Text>
+              </TouchableOpacity>
+              <TouchableOpacity style={Styles.createButton} onPress={createTaskHandler}>
+                <Text style={Styles.buttonText}>Save</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
+
   const footerCreatePortion = () => {
     return (
       <View style={styles.footer}>
@@ -344,6 +478,7 @@ const Home = () => {
       </ScrollView>
       {footerCreatePortion()}
       {createTaskModal()}
+      {editTaskModal()}
     </View>
   );
 };
