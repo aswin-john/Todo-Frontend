@@ -110,7 +110,7 @@ const Home = () => {
     <FlatList
       data={taskList}
       renderItem={renderTaskList}
-      keyExtractor={(item) => item._id.toString()}
+      keyExtractor={(item) => item?._id.toString()}
       contentContainerStyle={styles.taskListContainer}
     />
   );
