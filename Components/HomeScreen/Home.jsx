@@ -12,7 +12,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const Home = () => {
   const navigation = useNavigation();
-  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem, taskSingleItemDisplay} = useContext(AuthContext);
+  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem, taskSingleItemDisplay, updateTaskFunc} = useContext(AuthContext);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -49,6 +49,33 @@ const Home = () => {
         setFormattedTimeBackend('');
         setModalVisible(false);
         fetchTaskFunction();
+      }
+    } catch (error) {
+      console.log("Error --->>", error);
+    }
+  };
+
+
+  const updateTaskHandler = async () => {
+    const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
+    // console.log('Combined DateTime:', combinedDateTime);
+    // console.log('Combined DateTime:', selectedTaskId);
+
+    try {
+      const response = await updateTaskFunc(selectedTaskId,taskTitle, taskDescription, combinedDateTime);
+      // console.log("Response---->", response);
+      if (response?.status === 200 || response?.status === 201) {
+        // console.log("Response Data---->", response?.data);
+        alert(response?.data?.message ? response?.data?.message : "Task created successfully");
+        setTaskTitle('');
+        setTaskDescription('');
+        setDate(new Date());
+        setTime(new Date());
+        setFormattedDateBackend('');
+        setFormattedTimeBackend('');
+        setEditModalVisible(false);
+        fetchTaskFunction();
+
       }
     } catch (error) {
       console.log("Error --->>", error);
@@ -449,7 +476,7 @@ const Home = () => {
               <TouchableOpacity style={Styles.cancelButton} onPress={() => setEditModalVisible(false)}>
                 <Text style={Styles.buttonText}>Cancel</Text>
               </TouchableOpacity>
-              <TouchableOpacity style={Styles.createButton} onPress={createTaskHandler}>
+              <TouchableOpacity style={Styles.createButton} onPress={updateTaskHandler}>
                 <Text style={Styles.buttonText}>Save</Text>
               </TouchableOpacity>
             </View>

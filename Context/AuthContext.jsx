@@ -128,10 +128,6 @@ export const AuthProvider = ({children}) => {
     );
     const url = `https://todo-frontend-mvps.onrender.com/api/tasks`;
 
-    
-
-   
-
     const data = {
       title: taskTitle,
       description: taskDescription,
@@ -172,6 +168,69 @@ export const AuthProvider = ({children}) => {
       }
     }
   };
+
+
+  const updateTaskFunc = async (
+    itemId,
+    taskTitle,taskDescription ,combinedDateTime
+  ) => {
+    setLoading(true);
+    console.log(
+      'status________________________________________',
+      // taskTitle,taskDescription ,
+      combinedDateTime
+    );
+
+    console.log(
+      'Date & TIme from Auth',
+      combinedDateTime
+    );
+    const url = `https://todo-frontend-mvps.onrender.com/api/tasks/${itemId}`;
+
+    const data = {
+      title: taskTitle,
+      description: taskDescription,
+      status:'in_progress',
+      dueDate: combinedDateTime,
+      
+      priority: 'high',
+      
+    };
+    console.log('Data--->', data);
+    try {
+      const response = await axios.put(url, data, {
+        headers: {
+          // 'Content-Type': 'multipart/form-data',
+          Authorization: `Bearer ${tokensValue}`,
+          // Replace 'Bearer' with your actual authentication type if it's different
+        },
+      });
+      setLoading(false);
+      console.log("Response--->",response)
+      return response;
+    } catch (error) {
+      if (error.response) {
+        // The request was made and the server responded with a status code
+        // that falls out of the range of 2xx
+        // console.log("The server responded with an error:", error.response.data);
+        // console.log("Error message--->", error.response.data.message);
+        // console.log("Status code:", error.response.status);
+        setLoading(false);
+        return error.response.data;
+      } else if (error.request) {
+        // The request was made but no response was received
+        // console.log("No response received from the server:", error.request);
+        setLoading(false);
+      } else {
+        // Something happened in setting up the request that triggered an Error
+        // console.log("Error setting up the request:", error.message);
+        setLoading(false);
+      }
+    }
+  };
+
+
+  
 
 
   const taskDisplayFunc = async () => {
@@ -298,6 +357,8 @@ export const AuthProvider = ({children}) => {
         taskDisplayFunc,
         deleteTaskItem,
         taskSingleItemDisplay,
+        updateTaskFunc,
+        
       }}>
       {children}
     </AuthContext.Provider>
