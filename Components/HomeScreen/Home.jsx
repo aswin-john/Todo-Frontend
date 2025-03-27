@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, StyleSheet, Dimensions, FlatList, RefreshControl } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, StyleSheet, Dimensions, FlatList, RefreshControl,BackHandler,Button } from 'react-native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../Context/AuthContext';
@@ -12,7 +12,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const Home = () => {
   const navigation = useNavigation();
-  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem, taskSingleItemDisplay, updateTaskFunc} = useContext(AuthContext);
+  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem, taskSingleItemDisplay, updateTaskFunc,logout} = useContext(AuthContext);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -28,6 +28,7 @@ const Home = () => {
   const [selectedTaskId, setSelectedTaskId] = useState('');
 
   const [editModalVisible, setEditModalVisible] = useState(false);
+  const [isModalVisible, setIsModalVisible] = useState(false);
 
   const [singleTask, setSingleTask] = useState({});
   const [refreshing, setRefreshing] = useState(false); // State for pull-to-refresh
@@ -119,6 +120,30 @@ const Home = () => {
     console.log('useEffect called');
     viewTaskHandler();
   }, [selectedTaskId]);
+
+  useEffect(() => {
+    const backAction = () => {
+      setIsModalVisible(true); // Show modal on back button press
+      return true; // Prevent default back button behavior
+    };
+
+    const backHandler = BackHandler.addEventListener(
+      'hardwareBackPress',
+      backAction,
+    );
+
+    return () => backHandler.remove(); // Cleanup on unmount
+  }, []);
+
+  const handleLogout = () => {
+    logout(); // Call logout function
+    setIsModalVisible(false); // Close modal
+    navigation.replace('Login'); // Navigate to the Login screen
+  };
+
+  const handleCancel = () => {
+    setIsModalVisible(false); // Close modal
+  };
 
   const viewTaskHandler = async () => {
     console.log("View task handler function called ===>>>")
@@ -513,6 +538,23 @@ const Home = () => {
         {taskListHandler()}
          {/* Render Delete Confirmation Modal */}
       {deleteConfirmationModal()}
+      <Modal
+        transparent={true}
+        animationType="slide"
+        visible={isModalVisible}
+        onRequestClose={() => setIsModalVisible(false)}>
+        <View style={styles.modalContainer}>
+          <View style={styles.modalContent}>
+            <Text style={styles.modalText}>
+              Are you sure you want to logout?
+            </Text>
+            <View style={styles.buttonContainer}>
+              <Button title="Yes" onPress={handleLogout} />
+              <Button title="No" onPress={handleCancel} />
+            </View>
+          </View>
+        </View>
+      </Modal>
       </ScrollView>
       {footerCreatePortion()}
       {createTaskModal()}
@@ -652,6 +694,26 @@ const styles = StyleSheet.create({
   confirmText: {
     color: "#fff",
     fontWeight: "bold",
+  },
+
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  modalContent: {
+    width: 300,
+    padding: 20,
+    backgroundColor: 'white',
+    borderRadius: 10,
+    alignItems: 'center',
+  },
+
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    width: '100%',
   },
 
 });

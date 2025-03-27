@@ -345,6 +345,17 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const logout = async () => {
+    try {
+      await AsyncStorage.removeItem('userInfo'); // Clear user info from AsyncStorage
+      setUserInfo({}); // Clear user info from state
+      setTokenValue(''); // Clear token from state
+      console.log('User logged out successfully');
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
 
 
 
@@ -358,6 +369,7 @@ export const AuthProvider = ({children}) => {
         deleteTaskItem,
         taskSingleItemDisplay,
         updateTaskFunc,
+        logout
         
       }}>
       {children}
