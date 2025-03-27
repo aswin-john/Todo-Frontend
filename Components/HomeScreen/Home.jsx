@@ -12,7 +12,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const Home = () => {
   const navigation = useNavigation();
-  const { loading, createTaskFunc, taskDisplayFunc } = useContext(AuthContext);
+  const { loading, createTaskFunc, taskDisplayFunc , deleteTaskItem} = useContext(AuthContext);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -23,7 +23,9 @@ const Home = () => {
   const [formattedTimeBackend, setFormattedTimeBackend] = useState('');
   const [showDatePicker, setShowDatePicker] = useState(false);
   const [showTimePicker, setShowTimePicker] = useState(false);
+  const [deleteModalVisible, setDeleteModalVisible] = useState(false);
   const [taskList, setTaskList] = useState([]);
+  const [selectedTaskId, setSelectedTaskId] = useState('');
 
   const createTaskHandler = async () => {
     const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
@@ -42,6 +44,7 @@ const Home = () => {
         setFormattedDateBackend('');
         setFormattedTimeBackend('');
         setModalVisible(false);
+        fetchTaskFunction();
       }
     } catch (error) {
       console.log("Error --->>", error);
@@ -72,6 +75,51 @@ const Home = () => {
     fetchTaskFunction();
   }, []);
 
+  const taskDeleteHandler = async () => {
+    console.log('delete task  Idd----->>>>>>>',selectedTaskId);
+    try {
+      const response = await deleteTaskItem(selectedTaskId);
+      console.log('delete task  Idd after response from screen----->>>>>>>',selectedTaskId);
+      console.log('Response for delete task items ----->>>>>>>', response);
+      console.log('Response Status for delete task items ----->>>>>>>', response?.status);
+      if (response.status === 200 || response.status === 201) {
+        console.log(
+          'Response for delete tsaks ----->>>>>>>',
+          response.data,
+        );
+        // console.log("Response banner----->>>>>>>", response.data.data.banner.banner_offer);
+        // Snackbar.show({
+        //   text: response.message ? response.message : 'Something went wrong',
+        //   duration: Snackbar.LENGTH_LONG,
+        //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        //   textColor: 'white',
+        //   marginBottom: 30,
+        // });
+        alert(response?.data ? response?.data : 'Task deleted successfully');
+        setDeleteModalVisible(false);
+        fetchTaskFunction();
+
+      } else {
+        // Snackbar.show({
+        //   text: response.message ? response.message : 'Something went wrong',
+        //   duration: Snackbar.LENGTH_LONG,
+        //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+        //   textColor: 'white',
+        //   marginBottom: 30,
+        // });
+      }
+    } catch (error) {
+      // Snackbar.show({
+      //   text: 'Something went wrong',
+      //   duration: Snackbar.LENGTH_LONG,
+      //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
+      //   textColor: 'white',
+      //   marginBottom: 30,
+      // });
+      console.log('Error in delete Promotion ----->>>>>>>', error);
+    }
+  };
+
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
@@ -100,6 +148,12 @@ const Home = () => {
     console.log('Date has changed:', date);
   }, [date]);
 
+  const handleDeletePress = (taskId) => {
+    console.log('Task ID:', taskId);
+    setSelectedTaskId(taskId);
+    setDeleteModalVisible(true);
+  };
+
   const renderTaskList = ({ item }) => (
     <View style={styles.taskItem}>
       {/* Task Title & Description */}
@@ -127,13 +181,60 @@ const Home = () => {
           <Icon name="edit" size={20} color="#007AFF" />
           <Text style={styles.iconLabel}>Edit</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.iconButton}>
+         {/* Update the TouchableOpacity for delete */}
+        <TouchableOpacity
+          style={styles.iconButton}
+          onPress={() => handleDeletePress(item?._id)}
+        >
           <Icon name="delete" size={20} color="#FF3B30" />
           <Text style={styles.iconLabel}>Delete</Text>
         </TouchableOpacity>
       </View>
     </View>
   );
+
+  // Function to render delete confirmation modal
+  const deleteConfirmationModal = () => {
+    return (
+      <Modal
+        transparent={true}
+        animationType="fade"
+        visible={deleteModalVisible}
+        onRequestClose={() => setDeleteModalVisible(false)}
+      >
+        <View style={styles.modalDeleteContainer}>
+          <View style={styles.modalDeleteContent}>
+            <Text style={styles.modalText}>
+              <Text style={{ fontStyle: "italic" }}>Do you wish a</Text>{" "}
+              <Text style={{ fontWeight: "bold", fontStyle: "italic" }}>
+                Permanent Delete?
+              </Text>
+            </Text>
+
+            {/* Buttons */}
+            <View style={styles.buttonDeleteContainer}>
+              <TouchableOpacity
+                style={styles.cancelDeleteButton}
+                onPress={() => setDeleteModalVisible(false)}
+              >
+                <Text style={styles.cancelText}>Cancel</Text>
+              </TouchableOpacity>
+
+              <TouchableOpacity
+                style={styles.confirmButton}
+                onPress={() => {
+                  taskDeleteHandler();
+                  // setDeleteModalVisible(false);
+                }}
+              >
+                <Text style={styles.confirmText}>Confirm</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+    );
+  };
 
   const taskListHandler = () => (
     <FlatList
@@ -238,6 +339,8 @@ const Home = () => {
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
         {taskListHandler()}
+         {/* Render Delete Confirmation Modal */}
+      {deleteConfirmationModal()}
       </ScrollView>
       {footerCreatePortion()}
       {createTaskModal()}
@@ -328,6 +431,56 @@ const styles = StyleSheet.create({
     color: '#666',
     marginTop: 3,
   },
+
+
+  modalDeleteContainer: {
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.5)",
+  },
+  modalDeleteContent: {
+    width: 300,
+    backgroundColor: "#fff",
+    padding: 20,
+    borderRadius: 10,
+    alignItems: "center",
+  },
+
+  modalText: {
+    fontSize: 18,
+    textAlign: "center",
+    marginBottom: 20,
+  },
+
+  buttonDeleteContainer: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    width: "100%",
+  },
+
+  cancelDeleteButton: {
+    flex: 1,
+    backgroundColor: "#D3D3D3",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 5,
+    marginRight: 10,
+  },
+
+  confirmButton: {
+    flex: 1,
+    backgroundColor: "#D1006E",
+    padding: 10,
+    alignItems: "center",
+    borderRadius: 5,
+  },
+
+  confirmText: {
+    color: "#fff",
+    fontWeight: "bold",
+  },
+
 });
 
 export default Home;

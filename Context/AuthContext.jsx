@@ -205,6 +205,49 @@ export const AuthProvider = ({children}) => {
     }
   };
 
+  const deleteTaskItem = async deleteId => {
+    setLoading(true);
+    console.log('delete id,', deleteId);
+    const url = `https://todo-frontend-mvps.onrender.com/api/tasks/${deleteId}`;
+    // console.log('delete id,', deleteId);
+    // console.log('BAse url', BASE_URL);
+    // console.log('Data---->', url);
+    // console.log('This is token value ...........................', tokensValue);
+    try {
+      const response = await axios.delete(url, {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${tokensValue}`,
+        },
+      });
+      // console.log('this is delete response', response);
+
+      setLoading(false);
+
+      return response;
+    } catch (error) {
+      // console.log('error response', error);
+      if (error.response) {
+        // console.log("The server responded with an error:", error.response.data);
+        // console.log("Error message--->", error.response.data.message);
+        // console.log("Status code:", error.response.status);
+        setLoading(false);
+        // console.log('this is delete response', error.response);
+        return error.response;
+      } else if (error.request) {
+        // console.log("No response received from the server:", error.request);
+        setLoading(false);
+        return error.request;
+        // console.log('this is delete response', error.request);
+      } else {
+        //console.log("Error setting up the request:", error.message);
+        setLoading(false);
+        // console.log('this is delete response', error.message);
+        return error.message;
+      }
+    }
+  };
+
 
 
 
@@ -215,6 +258,7 @@ export const AuthProvider = ({children}) => {
         usingEmailLogin,
         createTaskFunc,
         taskDisplayFunc,
+        deleteTaskItem,
       }}>
       {children}
     </AuthContext.Provider>
