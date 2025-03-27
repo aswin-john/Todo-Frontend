@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Modal, TextInput, ScrollView, StyleSheet, Dimensions, FlatList } from 'react-native';
 import DateTimePicker from "@react-native-community/datetimepicker";
 import { useNavigation } from '@react-navigation/native';
 import { AuthContext } from '../../Context/AuthContext';
@@ -10,7 +10,7 @@ const windowHeight = Dimensions.get('window').height;
 
 const Home = () => {
   const navigation = useNavigation();
-  const { loading, createTaskFunc,taskDisplayFunc } = useContext(AuthContext);
+  const { loading, createTaskFunc, taskDisplayFunc } = useContext(AuthContext);
 
   const [taskTitle, setTaskTitle] = useState('');
   const [taskDescription, setTaskDescription] = useState('');
@@ -24,30 +24,15 @@ const Home = () => {
   const [taskList, setTaskList] = useState([]);
 
   const createTaskHandler = async () => {
-    // console.log("Function called----->>");
-    // console.log('Task Title', taskTitle);
-    // console.log('Task Description', taskDescription);
-    // console.log('Task Date', formattedDateBackend);
-    // console.log('Task Time', formattedTimeBackend);
-
-    // Combine date and time into the desired format
-  const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
-  console.log('Combined DateTime:', combinedDateTime);
+    const combinedDateTime = `${formattedDateBackend}${formattedTimeBackend.substring(10)}`;
+    console.log('Combined DateTime:', combinedDateTime);
 
     try {
       const response = await createTaskFunc(taskTitle, taskDescription, combinedDateTime);
       console.log("Response---->", response);
       if (response?.status === 200 || response?.status === 201) {
         console.log("Response Data---->", response?.data);
-        // Snackbar.show({
-        //   text: response?.message ? response?.message : "Task created successfully",
-        //   duration: Snackbar.LENGTH_LONG,
-        //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        //   textColor: Colors.WHITE,
-        //   marginBottom: 30
-        // });
         alert(response?.data?.message ? response?.data?.message : "Task created successfully");
-        // Reset the values
         setTaskTitle('');
         setTaskDescription('');
         setDate(new Date());
@@ -55,27 +40,11 @@ const Home = () => {
         setFormattedDateBackend('');
         setFormattedTimeBackend('');
         setModalVisible(false);
-      } else {
-        // Snackbar.show({
-        //   text: response?.error ? response?.error : 'Something went wrong',
-        //   duration: Snackbar.LENGTH_LONG,
-        //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        //   textColor: Colors.WHITE,
-        //   marginBottom: 30
-        // });
       }
     } catch (error) {
-      // Snackbar.show({
-      //   text: error?.message ? error?.message : 'Something went wrong',
-      //   duration: Snackbar.LENGTH_LONG,
-      //   backgroundColor: 'rgba(0, 0, 0, 0.5)',
-      //   textColor: Colors.WHITE,
-      //   marginBottom: 30
-      // });
       console.log("Error --->>", error);
     }
   };
-
 
   const fetchTaskFunction = async () => {
     try {
@@ -88,24 +57,10 @@ const Home = () => {
           setTaskList([]);
         }
       } else {
-        Snackbar.show({
-          text: response.message ? response.message : t('something-went-wrong'),
-          duration: Snackbar.LENGTH_LONG,
-          backgroundColor: 'rgba(0, 0, 0, 0.5)',
-          textColor: Colors.WHITE,
-          marginBottom: 30,
-        });
         setTaskList([]);
       }
     } catch (error) {
-      console.log('Hello Here home error-->',error);
-      Snackbar.show({
-        text: t('something-went-wrong'),
-        duration: Snackbar.LENGTH_LONG,
-        backgroundColor: 'rgba(0, 0, 0, 0.5)',
-        textColor: Colors.WHITE,
-        marginBottom: 30,
-      });
+      console.log('Hello Here home error-->', error);
       setTaskList([]);
     }
   };
@@ -118,12 +73,10 @@ const Home = () => {
   const handleDateChange = (event, selectedDate) => {
     setShowDatePicker(false);
     if (selectedDate) {
-      
       setDate(selectedDate);
-      // Format the date as needed (e.g., 'YYYY-MM-DD')
-    const formattedDate = selectedDate.toISOString().split('T')[0];
-    console.log('Selected Date:', formattedDate);
-    setFormattedDateBackend(formattedDate);
+      const formattedDate = selectedDate.toISOString().split('T')[0];
+      console.log('Selected Date:', formattedDate);
+      setFormattedDateBackend(formattedDate);
     } else {
       console.log('No date selected');
     }
@@ -133,8 +86,7 @@ const Home = () => {
     setShowTimePicker(false);
     if (selectedTime) {
       setTime(selectedTime);
-      // Format the time as needed (e.g., 'HH:mm:ss')
-      const formattedTime = selectedTime.toISOString()
+      const formattedTime = selectedTime.toISOString();
       console.log('Selected Time:', formattedTime);
       setFormattedTimeBackend(formattedTime);
     } else {
@@ -145,6 +97,23 @@ const Home = () => {
   useEffect(() => {
     console.log('Date has changed:', date);
   }, [date]);
+
+  const renderTaskList = ({ item }) => (
+    <View style={styles.taskItem}>
+      <Text style={styles.taskTitle}>{item?.title}</Text>
+      <Text style={styles.taskDescription}>{item?.description}</Text>
+      <Text style={styles.taskDueDate}>{item?.dueDate}</Text>
+    </View>
+  );
+
+  const taskListHandler = () => (
+    <FlatList
+      data={taskList}
+      renderItem={renderTaskList}
+      keyExtractor={(item) => item._id.toString()}
+      contentContainerStyle={styles.taskListContainer}
+    />
+  );
 
   const createTaskModal = () => {
     return (
@@ -192,7 +161,7 @@ const Home = () => {
                 <Text>{date ? date.toLocaleDateString() : 'Select Date'}</Text>
               </TouchableOpacity>
               <TouchableOpacity style={Styles.dateButton} onPress={() => setShowTimePicker(true)}>
-              <Text>{time ? time.toLocaleTimeString() : 'Select Time'}</Text>
+                <Text>{time ? time.toLocaleTimeString() : 'Select Time'}</Text>
               </TouchableOpacity>
             </View>
             {showDatePicker && (
@@ -239,7 +208,7 @@ const Home = () => {
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-        {/* Your other components go here */}
+        {taskListHandler()}
       </ScrollView>
       {footerCreatePortion()}
       {createTaskModal()}
@@ -262,6 +231,35 @@ const styles = StyleSheet.create({
     bottom: 0,
     width: '100%',
     height: windowHeight / 10,
+  },
+  taskListContainer: {
+    paddingBottom: 100,
+  },
+  taskItem: {
+    backgroundColor: '#f9f9f9',
+    padding: 15,
+    marginVertical: 8,
+    borderRadius: 10,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 5,
+    elevation: 3,
+  },
+  taskTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: '#333',
+  },
+  taskDescription: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 5,
+  },
+  taskDueDate: {
+    fontSize: 12,
+    color: '#999',
+    marginTop: 5,
   },
 });
 
